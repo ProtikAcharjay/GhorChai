@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    RentPost | Home
+{% endblock %}
+
+{% block content %}
+    <h1 class="text-center mt-4">
+        Welcome to RentPost
+    </h1>
+
+    <a href="{% url "post_create" %}" class="btn btn-primary mt-2 mb-4">
+        Dump your post here
+    </a>
+    <div class="container row gap-3">
+        {% for post in posts  %}
+            <div class="card" style="width: 18rem;">
+                <img src="{{post.image.url}}" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">{{post.title}}</h5>
+                    <p class="card-text">{{post.description}}</p>
+                    <a href="{% url "post_edit" post.id %}" class="btn btn-primary">Edit Post</a>
+                    <a href="{% url "post_delete" post.id %}" class="btn btn-danger">Delete Post</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
