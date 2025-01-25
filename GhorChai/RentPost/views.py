@@ -16,9 +16,9 @@ def post_create(request):
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save(commit=False)
-            form.owner = request.user
-            form.save()
+            post = form.save(commit=False)
+            post.owner = request.user
+            post.save()
             return redirect('post_list')
     else:
         form = PostForm()
