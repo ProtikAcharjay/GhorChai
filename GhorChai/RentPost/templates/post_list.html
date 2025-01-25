@@ -1,17 +1,13 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    RentPost | Home
+    GhorChai | Home
 {% endblock %}
 
 {% block content %}
-    <h1 class="text-center mt-4">
-        Welcome to RentPost
+    <h1 class="text-center m-4">
+        Welcome to GhorChai
     </h1>
-
-    <a href="{% url "post_create" %}" class="btn btn-primary mt-2 mb-4">
-        Dump your post here
-    </a>
     <div class="container row gap-3">
         {% for post in posts  %}
             <div class="card" style="width: 18rem;">
