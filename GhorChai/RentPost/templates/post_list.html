@@ -11,10 +11,11 @@
     <div class="container row gap-3">
         {% for post in posts  %}
             <div class="card" style="width: 18rem;">
-                <img src="{{post.image.url}}" class="card-img-top" alt="...">
+                <img src="{% if post.image %}{{ post.image.url }}{% else %}{{ 'path/to/default-image.jpg' }}{% endif %}" class="card-img-top" alt="...">
                 <div class="card-body">
                     <h5 class="card-title">{{post.title}}</h5>
                     <p class="card-text">{{post.description}}</p>
+                    <p class="card-text">{{post.price}} Tk</p>
                     {% if post.owner == user %}
                     <a href="{% url "post_edit" post.id %}" class="btn btn-primary">Edit Post</a>
                     <a href="{% url "post_delete" post.id %}" class="btn btn-danger">Delete Post</a>

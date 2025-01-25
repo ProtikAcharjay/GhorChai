@@ -19,8 +19,10 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth.urls import views as auth_views
+from django.shortcuts import redirect
 
 urlpatterns = [
+    path('', lambda request: redirect('post/')),
     path('admin/', admin.site.urls),
     path('post/', include('RentPost.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
