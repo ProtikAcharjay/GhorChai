@@ -14,6 +14,10 @@ def post_list(request):
     posts = Post.objects.all().order_by('-created_at')
     return render(request, 'post_list.html', {'posts': posts})
 
+def own_post_list(request):
+    posts = Post.objects.all().order_by('-created_at')
+    return render(request, 'post_list.html', {'posts': posts, "own_post": True})
+
 @login_required
 def post_create(request):
     if request.method == 'POST':

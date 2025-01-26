@@ -28,24 +28,55 @@
 
         <div class="col-8" style="overflow-y: auto; height: 100%;">
             <h1 class="text-center m-4">Welcome to GhorChai</h1>
-            <div class="row gap-3 justify-content-center">
-                {% for post in posts %}
-                    <div class="card" style="width: 18rem;">
-                        <img src="{% if post.image %}{{ post.image.url }}{% else %}{{ 'path/to/default-image.jpg' }}{% endif %}" 
-                             class="card-img-top" 
-                             alt="Post Image">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ post.title }}</h5>
-                            <p class="card-text">{{ post.description }}</p>
-                            <p class="card-text">{{ post.price }} Tk</p>
-                            {% if post.owner == user %}
-                                <a href="{% url "post_edit" post.id %}" class="btn btn-primary">Edit Post</a>
-                                <a href="{% url "post_delete" post.id %}" class="btn btn-danger">Delete Post</a>
-                            {% endif %}
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
+            <div class="row gap-3 justify-content-center mx-2">
+                {% if own_post == True %}
+                    {% for post in posts %}
+                        {% if post.owner == user %}
+                            <div class="card mb-3" style="width: 100%; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+                                <div class="row g-0 align-items-center">
+                                    <div class="col-md-3">
+                                        <img src="{% if post.image %}{{ post.image.url }}{% else %}{{ '' }}{% endif %}" 
+                                             class="img-fluid rounded-start" 
+                                             alt="Post Image" 
+                                             style="height: 150px; object-fit: cover; width: 100%;">
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ post.title }}</h5>
+                                            <p class="card-text">{{ post.description }}</p>
+                                            <p class="card-text"><small class="text-muted">{{ post.price }} Tk</small></p>
+                                            <a href="{% url 'post_edit' post.id %}" class="btn btn-primary btn-sm">Edit Post</a>
+                                            <a href="{% url 'post_delete' post.id %}" class="btn btn-danger btn-sm">Delete Post</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    {% for post in posts %}
+                        {% if post.owner != user %}
+                            <div class="card mb-3" style="width: 100%; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+                                <div class="row g-0 align-items-center">
+                                    <div class="col-md-3">
+                                        <img src="{% if post.image %}{{ post.image.url }}{% else %}{{ '' }}{% endif %}" 
+                                             class="img-fluid rounded-start" 
+                                             alt="Post Image" 
+                                             style="height: 150px; object-fit: cover; width: 100%;">
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ post.title }}</h5>
+                                            <p class="card-text">{{ post.description }}</p>
+                                            <p class="card-text"><small class="text-muted">{{ post.price }} Tk</small></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>            
         </div>
 
         <div class="col-2 border-start p-3">
