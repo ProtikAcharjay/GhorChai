@@ -11,12 +11,33 @@ def index(request):
     return render(request, 'index.html')
 
 def post_list(request):
-    posts = Post.objects.all().order_by('-created_at')
-    return render(request, 'post_list.html', {'posts': posts})
+    my_posts = request.GET.get('my_posts') == 'on'
+    
+    price_range = request.GET.get('price_range', '')
+    min_price = None
+    max_price = None
 
-def own_post_list(request):
-    posts = Post.objects.all().order_by('-created_at')
-    return render(request, 'post_list.html', {'posts': posts, "own_post": True})
+    if price_range:
+        try:
+            min_price, max_price = map(int, price_range.split('-'))
+        except ValueError:
+            pass
+
+    posts = Post.objects.all()
+
+    if my_posts:
+        posts = posts.filter(owner=request.user)
+
+    if min_price is not None and max_price is not None:
+        posts = posts.filter(price__gte=min_price, price__lte=max_price)
+    elif min_price is not None:
+        posts = posts.filter(price__gte=min_price)
+    elif max_price is not None:
+        posts = posts.filter(price__lte=max_price)
+
+    posts = posts.order_by('-created_at')
+
+    return render(request, 'post_list.html', {'posts': posts})
 
 @login_required
 def post_create(request):
