@@ -5,23 +5,53 @@
 {% endblock %}
 
 {% block content %}
-    <h1 class="text-center m-4">
-        Welcome to GhorChai
-    </h1>
-    <div class="container row gap-3">
-        {% for post in posts  %}
-            <div class="card" style="width: 18rem;">
-                <img src="{% if post.image %}{{ post.image.url }}{% else %}{{ 'path/to/default-image.jpg' }}{% endif %}" class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h5 class="card-title">{{post.title}}</h5>
-                    <p class="card-text">{{post.description}}</p>
-                    <p class="card-text">{{post.price}} Tk</p>
-                    {% if post.owner == user %}
-                    <a href="{% url "post_edit" post.id %}" class="btn btn-primary">Edit Post</a>
-                    <a href="{% url "post_delete" post.id %}" class="btn btn-danger">Delete Post</a>
-                    {% endif %}
+<div class="container-fluid">
+    <div class="row" style="height: 100vh; overflow: hidden;">
+        <div class="col-2 border-end p-3">
+            <h4>Filters</h4>
+            <form>
+                <div class="mb-3">
+                    <label for="filter1" class="form-label">Category</label>
+                    <select id="filter1" class="form-select">
+                        <option selected>Choose...</option>
+                        <option value="1">Category 1</option>
+                        <option value="2">Category 2</option>
+                    </select>
                 </div>
+                <div class="mb-3">
+                    <label for="filter2" class="form-label">Price Range</label>
+                    <input type="text" id="filter2" class="form-control" placeholder="e.g. 100-500 Tk">
+                </div>
+                <button type="submit" class="btn btn-primary">Apply Filters</button>
+            </form>
+        </div>
+
+        <div class="col-8" style="overflow-y: auto; height: 100%;">
+            <h1 class="text-center m-4">Welcome to GhorChai</h1>
+            <div class="row gap-3 justify-content-center">
+                {% for post in posts %}
+                    <div class="card" style="width: 18rem;">
+                        <img src="{% if post.image %}{{ post.image.url }}{% else %}{{ 'path/to/default-image.jpg' }}{% endif %}" 
+                             class="card-img-top" 
+                             alt="Post Image">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ post.title }}</h5>
+                            <p class="card-text">{{ post.description }}</p>
+                            <p class="card-text">{{ post.price }} Tk</p>
+                            {% if post.owner == user %}
+                                <a href="{% url "post_edit" post.id %}" class="btn btn-primary">Edit Post</a>
+                                <a href="{% url "post_delete" post.id %}" class="btn btn-danger">Delete Post</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
-        {% endfor %}
+        </div>
+
+        <div class="col-2 border-start p-3">
+            <h4>Coming Soon</h4>
+            <p>This area will be updated later.</p>
+        </div>
     </div>
+</div>
 {% endblock %}
