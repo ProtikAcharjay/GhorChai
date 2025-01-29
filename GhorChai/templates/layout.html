@@ -29,9 +29,11 @@
                     <a class="btn btn-info shadow-sm hover-shadow" href="{% url 'post_create' %}">Create a New Post</a>
                 </li>
             </ul>
-            <form class="d-flex mt-2" role="search">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success mx-2" type="submit">Search</button>
+            <form method="GET" action="{% url 'post_list' %}" class="d-flex mt-2" role="search">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search" value="{{ request.GET.search }}">
+                <button class="btn btn-outline-success mx-2" type="submit">Search</button>             
+                {% comment %} <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"> {% endcomment %}
+                {% comment %} <button class="btn btn-outline-success mx-2" type="submit">Search</button> {% endcomment %}
                 {% if user.is_authenticated %}
                 <label for="username" class="mx-1 pt-1 text-info">@{{ user.username }}</label>
                 <a href="{% url 'logout' %}" class="btn btn-outline-danger mx-2">Logout</a>

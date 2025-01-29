@@ -11,6 +11,8 @@ def index(request):
     return render(request, 'index.html')
 
 def post_list(request):
+    search_query = request.GET.get('search', '')
+
     my_posts = request.GET.get('my_posts') == 'on'
     
     price_range = request.GET.get('price_range', '')
@@ -27,6 +29,9 @@ def post_list(request):
 
     if my_posts:
         posts = posts.filter(owner=request.user)
+
+    if search_query:
+        posts = Post.objects.filter(title__icontains=search_query)
 
     if min_price is not None and max_price is not None:
         posts = posts.filter(price__gte=min_price, price__lte=max_price)
