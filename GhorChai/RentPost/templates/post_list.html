@@ -44,11 +44,26 @@
                                     <h5 class="card-title">{{ post.title }}</h5>
                                     <p class="card-text">{{ post.description }}</p>
                                     <p class="card-text"><small class="text-muted">{{ post.price }} Tk</small></p>
-                                    <p class="card-text text-end"><small class="text-info">{{ post.owner.username }}</small></p>
-                                    {% if post.owner == user %}
-                                        <a href="{% url "post_edit" post.id %}" class="btn btn-primary btn-sm">Edit Post</a>
-                                        <a href="{% url "post_delete" post.id %}" class="btn btn-danger btn-sm">Delete Post</a>
-                                    {% endif %}
+                                    <p class="card-text"><small>Author: </small><small class="text-info">{{ post.owner.username }}</small></p>
+
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="reaction-icons d-flex justify-content-between">
+                                            <button class="btn btn-outline-success btn-lg me-3 reaction-button" id="upvote">
+                                                <i class="fas fa-thumbs-up"></i> <!-- Upvote (thumbs-up) -->
+                                            </button>
+                                            <button class="btn btn-outline-danger btn-lg reaction-button" id="downvote">
+                                                <i class="fas fa-thumbs-down"></i> <!-- Downvote (thumbs-down) -->
+                                            </button>
+                                        </div>                                        
+
+                                        <a href="{% url 'post_edit' post.id %}" class="btn btn-outline-primary btn-sm ms-auto">Expand</a>
+                                    
+                                        {% if post.owner == user %}
+                                            <a href="{% url 'post_edit' post.id %}" class="btn btn-outline-primary btn-sm ms-2">Edit Post</a>
+                                            <a href="{% url 'post_delete' post.id %}" class="btn btn-outline-danger btn-sm ms-2">Delete Post</a>
+                                        {% endif %}
+                                    </div>
+                                    
                                 </div>
                             </div>
                         </div>
