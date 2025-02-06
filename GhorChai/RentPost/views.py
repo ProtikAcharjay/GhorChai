@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Post
+from .models import Post, PostReaction
 from .forms import PostForm, UserRegistrationForm
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
@@ -92,3 +92,22 @@ def register(request):
     else:
         form = UserRegistrationForm()
     return render(request, 'registration/register.html', {'form': form})
+
+@login_required
+def react_to_post(request, post_id, reaction_type):
+    post = get_object_or_404(Post, id=post_id)
+    user = request.user
+
+    reaction, created = PostReaction.objects.get_or_create(post=post, user=user)
+
+    if reaction.reaction_type == reaction_type:
+        reaction.reaction_type = PostReaction.NO_REACTION
+    else:
+        reaction.reaction_type = reaction_type
+    
+    reaction.save()
+
+    upvotes = post.reactions.filter(reaction_type=PostReaction.UPVOTE).count()
+    downvotes = post.reactions.filter(reaction_type=PostReaction.DOWNVOTE).count()
+
+    return JsonResponse({"upvotes": upvotes, "downvotes": downvotes, "status": "success"})
