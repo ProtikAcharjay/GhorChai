@@ -17,15 +17,8 @@ def post_list(request):
 
     my_posts = request.GET.get('my_posts') == 'on'
     
-    price_range = request.GET.get('price_range', '')
-    min_price = None
-    max_price = None
-
-    if price_range:
-        try:
-            min_price, max_price = map(int, price_range.split('-'))
-        except ValueError:
-            pass
+    min_price = request.GET.get('min_price', None)
+    max_price = request.GET.get('max_price', None)
 
     posts = Post.objects.all()
 
@@ -37,10 +30,6 @@ def post_list(request):
 
     if min_price is not None and max_price is not None:
         posts = posts.filter(price__gte=min_price, price__lte=max_price)
-    elif min_price is not None:
-        posts = posts.filter(price__gte=min_price)
-    elif max_price is not None:
-        posts = posts.filter(price__lte=max_price)
 
     posts = posts.annotate(
         upvotes_count=Count('reactions', filter=Q(reactions__reaction_type=1)),

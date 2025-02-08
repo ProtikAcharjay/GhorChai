@@ -11,10 +11,12 @@
             <h4>Filters</h4>
             <form method="GET" action="{% url 'post_list' %}">
                 <div class="mb-3">
-                    <label for="filter2" class="form-label">Price Range</label>
-                    <input type="text" id="filter2" name="price_range" class="form-control" 
-                           value="{% if request.GET.price_range %}{{ request.GET.price_range }}{% endif %}" 
-                           placeholder="e.g. 100-500 Tk">
+                    <label class="form-label"><strong>Price Range (Tk)</strong></label>
+                    <div id="price-slider"></div>
+                    <p class="mt-2"><strong>Selected Range:</strong> <span id="price-display">0 - 10000 Tk</span></p>
+
+                    <input type="hidden" id="min_price" name="min_price" value="{{ request.GET.min_price|default:0 }}">
+                    <input type="hidden" id="max_price" name="max_price" value="{{ request.GET.max_price|default:10000 }}">
                 </div>
                 {% if user.is_authenticated %}
                 <div class="mb-3 form-check">
@@ -83,6 +85,24 @@
 </div>
 <script>
     $(document).ready(function () {
+        let minPrice = parseInt("{{ request.GET.min_price|default:0 }}");
+        let maxPrice = parseInt("{{ request.GET.max_price|default:10000 }}");
+    
+        $("#price-slider").slider({
+            range: true,
+            min: 0,
+            max: 50000,
+            step: 100,
+            values: [minPrice, maxPrice],
+            slide: function(event, ui) {
+                $("#price-display").text(ui.values[0] + " - " + ui.values[1] + " Tk");
+                $("#min_price").val(ui.values[0]);
+                $("#max_price").val(ui.values[1]);
+            }
+        });
+    
+        $("#price-display").text(minPrice + " - " + maxPrice + " Tk");
+
         function sendReaction(reactionType, postId) {
             $.ajax({
                 url: `/post/${postId}/react/`,
