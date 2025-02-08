@@ -8,9 +8,10 @@ from django.contrib.auth import login
 from django.db.models import Q, Count
 from django.http import JsonResponse
 from .tasks import schedule_notifications
+import logging
 
+logger = logging.getLogger('django')
 
-# Create your views here.
 def index(request):
     return render(request, 'index.html')
 
@@ -44,29 +45,32 @@ def post_list(request):
 
 @login_required
 def post_create(request):
-    if request.method == 'POST':
-        form = PostForm(request.POST, request.FILES)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.owner = request.user
-            post.save()
+    try:
+        if request.method == 'POST':
+            form = PostForm(request.POST, request.FILES)
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.owner = request.user
+                post.save()
 
-            users = User.objects.exclude(id=request.user.id)
-            for user in users:
-                Notification.objects.create(
-                    user=user,
-                    post=post,
-                    message=f"{request.user.username} posted: {post.title}"
-                )
-            # Enable this when there is a need to manage a large number of users in a synchronized manner, 
-            # queuing tasks for asynchronous processing to handle them efficiently.
-            # schedule_notifications(post.id, request.user.username)
-            # After this run the command: `python manage.py qcluster`
-            
-            return redirect('post_list')
-    else:
-        form = PostForm()
-    return render(request, 'post_form.html', {'form': form})
+                users = User.objects.exclude(id=request.user.id)
+                for user in users:
+                    Notification.objects.create(
+                        user=user,
+                        post=post,
+                        message=f"{request.user.username} posted: {post.title}"
+                    )
+                # Enable this when there is a need to manage a large number of users in a synchronized manner, 
+                # queuing tasks for asynchronous processing to handle them efficiently.
+                # schedule_notifications(post.id, request.user.username)
+                # After this run the command: `python manage.py qcluster`
+                
+                return redirect('post_list')
+        else:
+            form = PostForm()
+        return render(request, 'post_form.html', {'form': form})
+    except Exception as e:
+        logger.error(f"Error occurred while creating post: {e}")
 
 @login_required
 def post_edit(request, post_id):
