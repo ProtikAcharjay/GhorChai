@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from django.db.models import Q, Count
 from django.http import JsonResponse
+from .tasks import schedule_notifications
 
 
 # Create your views here.
@@ -57,6 +58,10 @@ def post_create(request):
                     post=post,
                     message=f"{request.user.username} posted: {post.title}"
                 )
+            # Enable this when there is a need to manage a large number of users in a synchronized manner, 
+            # queuing tasks for asynchronous processing to handle them efficiently.
+            # schedule_notifications(post.id, request.user.username)
+            # After this run the command: `python manage.py qcluster`
             
             return redirect('post_list')
     else:

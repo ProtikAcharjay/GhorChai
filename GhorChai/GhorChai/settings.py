@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'RentPost',
     'crispy_forms',
     "crispy_bootstrap4",
+    'django_q',
 ]
 
 MIDDLEWARE = [
@@ -138,3 +139,15 @@ LOGOUT_REDIRECT_URL = '/post/'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
+
+
+Q_CLUSTER = {
+    'name': 'DjangoORM',
+    'orm': 'default',
+    'timeout': 60,
+    'retry': 120,
+    'max_attempts': 3,
+    'save_limit': 250,
+}
+
+
