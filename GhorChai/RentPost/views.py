@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from .models import Post, PostReaction
+from django.contrib.auth.models import User
+from .models import Post, PostReaction, Notification
 from .forms import PostForm, UserRegistrationForm, CommentForm
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
@@ -48,6 +49,15 @@ def post_create(request):
             post = form.save(commit=False)
             post.owner = request.user
             post.save()
+
+            users = User.objects.exclude(id=request.user.id)
+            for user in users:
+                Notification.objects.create(
+                    user=user,
+                    post=post,
+                    message=f"{request.user.username} posted: {post.title}"
+                )
+            
             return redirect('post_list')
     else:
         form = PostForm()
@@ -133,3 +143,18 @@ def post_reaction(request, post_id):
     downvotes = PostReaction.objects.filter(post=post, reaction_type=0).count()
 
     return JsonResponse({"upvotes": upvotes, "downvotes": downvotes, "user_reaction": reaction.reaction_type})
+
+@login_required
+def mark_notifications_read(request, notification_id):
+    notification = Notification.objects.filter(id=notification_id, user=request.user, is_read=False).first()
+    
+    if notification:
+        notification.is_read = True
+        notification.save()
+        
+        post_id = notification.post.id if notification.post else None
+
+        if post_id:
+            return redirect('post_view', post_id=post_id)
+
+    return redirect('post_list')

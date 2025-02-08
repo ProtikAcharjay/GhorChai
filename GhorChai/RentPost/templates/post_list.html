@@ -32,6 +32,7 @@
         <div class="col-8" style="overflow-y: auto; height: 100%;">
             <h1 class="text-center m-4">Welcome to GhorChai</h1>
             <div class="row gap-3 justify-content-center mx-2">
+                {% if posts %}
                 {% for post in posts %}
                     <div class="card mb-3" style="width: 100%; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
                         <div class="row g-0 align-items-center">
@@ -74,6 +75,15 @@
                         </div>
                     </div>
                 {% endfor %}
+                {% else %}
+                    <div class="alert alert-warning text-center" role="alert" style="border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+                        <h4 class="alert-heading">No Posts Found</h4>
+                        <p>It seems like there are no posts available right now. Please check back later.</p>
+                        <hr>
+                        <p class="mb-0">You can create a new post to share with others.</p>
+                        <a href="{% url 'post_create' %}" class="btn btn-primary mt-3">Create a Post</a>
+                    </div>
+                {% endif %}
             </div> 
         </div>
 

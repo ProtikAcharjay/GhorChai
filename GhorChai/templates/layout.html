@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <title>
         {% block title %}
             GhorChai
@@ -36,10 +37,27 @@
             </ul>
             <form method="GET" action="{% url 'post_list' %}" class="d-flex mt-2" role="search">
                 <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search" value="{{ request.GET.search }}">
-                <button class="btn btn-outline-success mx-2" type="submit">Search</button>             
+                <button class="btn btn-outline-success mx-2" type="submit">Search</button>  
+                {% if user.is_authenticated %}
+                <ul class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown">
+                        🔔 <span class="badge bg-danger">{{ notifications|length }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        {% for notification in notifications %}
+                            <li>
+                                <a class="dropdown-item"  href="{% url 'mark_notifications_read' notification.id %}">
+                                    <strong>{{ notification.message }}</strong> <br>
+                                    <small>{{ notification.created_at|timesince }} ago</small>
+                                </a>
+                            </li>
+                        {% empty %}
+                            <li><a class="dropdown-item">No new notifications</a></li>
+                        {% endfor %}
+                    </ul>
+                </ul>               
                 {% comment %} <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"> {% endcomment %}
                 {% comment %} <button class="btn btn-outline-success mx-2" type="submit">Search</button> {% endcomment %}
-                {% if user.is_authenticated %}
                 <label for="username" class="mx-1 pt-1 text-info">@{{ user.username }}</label>
                 <a href="{% url 'logout' %}" class="btn btn-outline-danger mx-2">Logout</a>
                 {% else %}
