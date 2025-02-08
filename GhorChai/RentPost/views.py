@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import Post, PostReaction
-from .forms import PostForm, UserRegistrationForm
+from .forms import PostForm, UserRegistrationForm, CommentForm
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
@@ -78,6 +78,31 @@ def post_edit(request, post_id):
         form = PostForm(instance=post)
 
     return render(request, 'post_form.html', {'form': form})
+
+def post_view(request, post_id):
+    post = Post.objects.filter(pk=post_id).annotate(
+        upvotes_count=Count('reactions', filter=Q(reactions__reaction_type=1)),
+        downvotes_count=Count('reactions', filter=Q(reactions__reaction_type=0))
+    ).first()
+
+    if request.method == 'POST' and 'comment' in request.POST:
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.user = request.user
+            comment.save()
+            return redirect('post_view', post_id=post.id)
+    else:
+        form = CommentForm()
+
+    comments = post.comments.all()
+
+    return render(request, 'post_detail.html', {
+        'post': post,
+        'comments': comments,
+        'form': form
+    })
 
 @login_required
 def post_delete(request, post_id):

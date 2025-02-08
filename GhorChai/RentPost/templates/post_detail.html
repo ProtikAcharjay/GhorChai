@@ -1,0 +1,106 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                {% if post.image %}
+                    <div class="text-center mt-3">
+                        <img src="{{ post.image.url }}" class="card-img-top border rounded-3 shadow-sm p-2" 
+                            alt="{{ post.title }}" style="max-width: 100%; border: 4px solid #ddd;">
+                    </div>
+                {% endif %}
+
+                
+                <div class="card-body">
+                    <h1 class="card-title">{{ post.title }}</h1>
+                    <p class="card-text">{{ post.description }}</p>
+                    <p><strong>Price:</strong> ${{ post.price }}</p>
+                    <p><strong>Posted by:</strong> {{ post.owner.username }}</p>
+                    <p><strong>Created on:</strong> {{ post.created_at }}</p>
+
+                    <div class="reaction-icons justify-content-between">
+                        <button class="btn btn-outline-success btn-lg me-3 reaction-button-upvote" data-post-id="{{ post.id }}">
+                            <i class="fas fa-thumbs-up"></i>
+                            <span id="upvote-count-{{ post.id }}">{{ post.upvotes_count }}</span>
+                        </button>
+
+                        <button class="btn btn-outline-danger btn-lg reaction-button-downvote" data-post-id="{{ post.id }}">
+                            <i class="fas fa-thumbs-down"></i>
+                            <span id="downvote-count-{{ post.id }}">{{ post.downvotes_count }}</span>
+                        </button>
+                    </div>  
+
+                    <hr>
+                    <h4>Comments:</h4>
+                    {% if post.comments.all %}
+                        <ul class="list-group list-group-flush">
+                            {% for comment in post.comments.all %}
+                                <li class="list-group-item">
+                                    <p><strong>{{ comment.user.username }}:</strong> {{ comment.comment }}</p>
+                                    <small class="text-muted">{{ comment.created_at }}</small>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No comments yet. Be the first to comment!</p>
+                    {% endif %}
+
+                    {% if user.is_authenticated %}
+                        <form method="POST">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button type="submit" class="btn btn-primary">Post Comment</button>
+                        </form>
+                    {% else %}
+                        <div class="alert alert-info text-center mt-4" role="alert">
+                            <p class="mb-0">
+                                <strong>You must be logged in to post a comment.</strong>  
+                                <a href="{% url 'login' %}" class="btn btn-sm btn-primary ms-2">Login</a>  
+                                <span>or</span>
+                                <a href="{% url 'register' %}" class="btn btn-sm btn-success ms-2">Sign Up</a>
+                            </p>
+                        </div>
+                    {% endif %}
+
+                    <a href="{% url 'post_list' %}" class="btn btn-outline-secondary mt-3">Back to Posts</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        function sendReaction(reactionType, postId) {
+            $.ajax({
+                url: `/post/${postId}/react/`,
+                type: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                },
+                data: {
+                    "reaction_type": reactionType,
+                },
+                success: function(data) {
+                    $(`#upvote-count-${postId}`).text(data.upvotes);
+                    $(`#downvote-count-${postId}`).text(data.downvotes);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error sending reaction:", error);
+                }
+            });
+        }
+
+        $(".reaction-button-upvote").click(function() {
+            const postId = $(this).data("post-id");
+            sendReaction(1, postId);
+        });
+    
+        $(".reaction-button-downvote").click(function() {
+            const postId = $(this).data("post-id");
+            sendReaction(0, postId);
+        });
+    });    
+</script>
+{% endblock %}

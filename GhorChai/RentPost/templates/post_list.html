@@ -59,7 +59,7 @@
                                             </button>
                                         </div>                          
 
-                                        <a href="{% url 'post_edit' post.id %}" class="btn btn-outline-primary btn-sm ms-auto">Expand</a>
+                                        <a href="{% url 'post_view' post.id %}" class="btn btn-outline-primary btn-sm ms-auto">Expand</a>
                                     
                                         {% if post.owner == user %}
                                             <a href="{% url 'post_edit' post.id %}" class="btn btn-outline-primary btn-sm ms-2">Edit Post</a>
@@ -81,7 +81,6 @@
         </div>
     </div>
 </div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
         function sendReaction(reactionType, postId) {

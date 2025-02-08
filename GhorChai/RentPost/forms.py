@@ -1,5 +1,5 @@
 from django import forms
-from .models import Post
+from .models import Post, Comment
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
@@ -14,3 +14,11 @@ class UserRegistrationForm(UserCreationForm):
         # for built in model use touple not array
         model = User
         fields = ('username', 'email', 'password1', 'password2')
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['comment']
+        widgets = {
+            'comment': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Write your comment...'})
+        }
