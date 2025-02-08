@@ -4,6 +4,8 @@ from .forms import PostForm, UserRegistrationForm
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
+from django.db.models import Q, Count
+from django.http import JsonResponse
 
 
 # Create your views here.
@@ -40,7 +42,12 @@ def post_list(request):
     elif max_price is not None:
         posts = posts.filter(price__lte=max_price)
 
-    posts = posts.order_by('-created_at')
+    posts = posts.annotate(
+        upvotes_count=Count('reactions', filter=Q(reactions__reaction_type=1)),
+        downvotes_count=Count('reactions', filter=Q(reactions__reaction_type=0))
+    ).order_by('-created_at')
+
+    # posts = posts.order_by('-created_at')
 
     return render(request, 'post_list.html', {'posts': posts})
 
@@ -94,20 +101,21 @@ def register(request):
     return render(request, 'registration/register.html', {'form': form})
 
 @login_required
-def react_to_post(request, post_id, reaction_type):
+def post_reaction(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     user = request.user
+    reaction_type = int(request.POST.get("reaction_type"))
 
     reaction, created = PostReaction.objects.get_or_create(post=post, user=user)
 
     if reaction.reaction_type == reaction_type:
-        reaction.reaction_type = PostReaction.NO_REACTION
+        reaction.reaction_type = -1
     else:
         reaction.reaction_type = reaction_type
-    
+
     reaction.save()
 
-    upvotes = post.reactions.filter(reaction_type=PostReaction.UPVOTE).count()
-    downvotes = post.reactions.filter(reaction_type=PostReaction.DOWNVOTE).count()
+    upvotes = PostReaction.objects.filter(post=post, reaction_type=1).count()
+    downvotes = PostReaction.objects.filter(post=post, reaction_type=0).count()
 
-    return JsonResponse({"upvotes": upvotes, "downvotes": downvotes, "status": "success"})
+    return JsonResponse({"upvotes": upvotes, "downvotes": downvotes, "user_reaction": reaction.reaction_type})
